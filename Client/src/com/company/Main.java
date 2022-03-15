@@ -1,5 +1,8 @@
 package com.company;
 
+import health_message.HealthMessageGenerator;
+import health_message.IHealthMessageGenerator;
+
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -7,7 +10,9 @@ import java.nio.charset.StandardCharsets;
 public class Main {
 
     public static void main(String[] args) {
-	// write your code here
+        // write your code here
+        IHealthMessageGenerator healthMessageGenerator = new HealthMessageGenerator();
+        System.out.println(healthMessageGenerator.generateMessage());
 
     }
     public static void send_packet(String s) throws IOException {
