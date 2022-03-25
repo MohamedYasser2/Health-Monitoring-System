@@ -13,7 +13,7 @@ public class Main {
         // write your code here
         IHealthMessageGenerator healthMessageGenerator = new HealthMessageGenerator();
         //System.out.println(healthMessageGenerator.generateMessage());
-        for(int i=0;i<11;i++)
+        for(int i=0;i<2048;i++)
             send_packet(healthMessageGenerator.generateMessage());
     }
 
