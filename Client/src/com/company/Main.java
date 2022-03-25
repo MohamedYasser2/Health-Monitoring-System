@@ -9,12 +9,14 @@ import java.nio.charset.StandardCharsets;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // write your code here
         IHealthMessageGenerator healthMessageGenerator = new HealthMessageGenerator();
-        System.out.println(healthMessageGenerator.generateMessage());
-
+        //System.out.println(healthMessageGenerator.generateMessage());
+        for(int i=0;i<11;i++)
+            send_packet(healthMessageGenerator.generateMessage());
     }
+
     public static void send_packet(String s) throws IOException {
         int server_port = 3500;
         DatagramSocket datagramSocket = new DatagramSocket();

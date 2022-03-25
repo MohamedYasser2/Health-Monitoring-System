@@ -1,6 +1,5 @@
 package health_message;
 
-import com.google.gson.Gson;
 import model.Disk;
 import model.Ram;
 import model.ServiceName;
