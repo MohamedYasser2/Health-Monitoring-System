@@ -12,7 +12,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
         // write your code here
         IHealthMessageGenerator healthMessageGenerator = new HealthMessageGenerator();
-        //System.out.println(healthMessageGenerator.generateMessage());
         for(int i=0;i<2048;i++)
             send_packet(healthMessageGenerator.generateMessage());
     }

@@ -1,4 +1,4 @@
-package main.java.com.company;
+package com.company;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -31,32 +31,24 @@ public class Main {
             Configuration conf = new Configuration();
             FileSystem hdfs = FileSystem.get(new URI("hdfs://hadoop-master:9000"),conf);
             LocalDate date = LocalDate.now();
-//            FileSystem fs = FileSystem.get(conf);
-//            FSDataOutputStream stream = fs.create(new     Path("/"+date.toString()+"/data.log"));
-//            stream.write(Integer.parseInt(messages.toString()));
-//            stream.flush();
-//            stream.sync();
-//            stream.close();
-            Path file = new Path("hdfs://hadoop-master:9000/" + date.toString() + "/" + date.toString() +".log");
-            if ( hdfs.exists( file )) { hdfs.delete( file, true ); }
-            OutputStream os = hdfs.create( file);
-            BufferedWriter br = new BufferedWriter( new OutputStreamWriter( os, "UTF-8" ) );
-            br.write(messages.toString());
-            br.close();
-            hdfs.close();
-            out.println("Created succesfully");
-//            String directoryName = "/"+date.toString()+"/"+ file;
-//            Path path = new Path(directoryName);
-//            fileSystem.mkdirs(path);
-//            if(fileSystem instanceof DistributedFileSystem) {
-//                out.println("HDFS is the underlying filesystem");
-//            }
-//            else {
-//                out.println("Other type of file system "+fileSystem.getClass());
-//            }
-            out.println("file created successfully !");
+            Path file = new Path("hdfs://hadoop-master:9000/" + date + "/" + "data.log");
+            if ( hdfs.exists( file )) {
+                out.println("file is found");
+                OutputStream os = hdfs.append(file);
+                BufferedWriter br = new BufferedWriter( new OutputStreamWriter( os, "UTF-8" ) );
+                br.write(messages.toString());
+                br.close();
+                hdfs.close();
+                out.println("Appended succesfully");
+            } else {
+                OutputStream os = hdfs.create( file);
+                BufferedWriter br = new BufferedWriter( new OutputStreamWriter( os, "UTF-8" ) );
+                br.write(messages.toString());
+                br.close();
+                hdfs.close();
+                out.println("Created succesfully");
+            }
         }
-
         //close connection
         //socket.close();
 
