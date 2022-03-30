@@ -9,11 +9,16 @@ import java.nio.charset.StandardCharsets;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         // write your code here
         IHealthMessageGenerator healthMessageGenerator = new HealthMessageGenerator();
-        for(int i=0;i<2048;i++)
+        int i = 1;
+        while(true) {
             send_packet(healthMessageGenerator.generateMessage());
+            System.out.println("Sending packet " + i);
+            i++;
+            Thread.sleep(10);
+        }
     }
 
     public static void send_packet(String s) throws IOException {

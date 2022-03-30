@@ -1,10 +1,8 @@
 package com.company;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.util.Progressable;
 
 import java.io.*;
 import java.net.DatagramPacket;
@@ -26,28 +24,43 @@ public class Main {
         out.println("Waiting....");
 
         while(true){
+            long Totalstart = System.nanoTime();
             ArrayList<String> messages = messageBatch(socket);
             out.println("Batch arrived.. sending to hadoop");
             Configuration conf = new Configuration();
             FileSystem hdfs = FileSystem.get(new URI("hdfs://hadoop-master:9000"),conf);
             LocalDate date = LocalDate.now();
-            Path file = new Path("hdfs://hadoop-master:9000/" + date + "/" + "data.log");
+            Path file = new Path("hdfs://hadoop-master:9000/" + date + ".log");
             if ( hdfs.exists( file )) {
                 out.println("file is found");
+                long start = System.nanoTime();
                 OutputStream os = hdfs.append(file);
                 BufferedWriter br = new BufferedWriter( new OutputStreamWriter( os, "UTF-8" ) );
                 br.write(messages.toString());
                 br.close();
-                hdfs.close();
+                long finish = System.nanoTime();
+                long timeElapsed = finish - start;
+                double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
+                out.println("Time taken to write data to hadoop is " + elapsedTimeInSecond + " seconds");
                 out.println("Appended succesfully");
             } else {
+                long start = System.nanoTime();
                 OutputStream os = hdfs.create( file);
                 BufferedWriter br = new BufferedWriter( new OutputStreamWriter( os, "UTF-8" ) );
                 br.write(messages.toString());
                 br.close();
-                hdfs.close();
+                long finish = System.nanoTime();
+                long timeElapsed = finish - start;
+                double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
+                out.println("Time taken to write data to hadoop is " + elapsedTimeInSecond + " seconds");
                 out.println("Created succesfully");
             }
+            long finish = System.nanoTime();
+            long timeElapsed = finish - Totalstart;
+            double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
+            out.println("Total time is " + elapsedTimeInSecond + "seconds / batch");
+            out.println("Total throughput is " + 1024 / elapsedTimeInSecond + " records/second");
+            hdfs.close();
         }
         //close connection
         //socket.close();
