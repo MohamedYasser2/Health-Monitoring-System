@@ -1,6 +1,5 @@
-import org.apache.hadoop.io.IntWritable;
 
-public class values extends IntWritable {
+public class values {
     private double cpu;
     private double disk;
     private double ram;
