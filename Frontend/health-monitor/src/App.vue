@@ -1,35 +1,40 @@
 <template>
-  <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-    Big Data
-    </v-app-bar>
-    <v-main>
-      <v-btn rounded @click="GetStatistics()">Get statistics </v-btn>
-      <div v-for="stat in statistics" :key="stat" >
-        <h3> {{stat}} </h3>
-      </div>
+  <v-app >
+  <Header></Header>
+    <v-main class="brown lighten-3 ">
+      <v-btn class="my-9 mx-7" color ="#1C0A00" style="font-weight:bold" dark rounded @click="GetStatistics()">Get statistics </v-btn>
       <div>
         <v-row>
-        <v-date-picker v-model="from"></v-date-picker>
-        <v-date-picker v-model="to"></v-date-picker>
+          <h2 class="ml-10">From Date</h2>
+          <v-spacer></v-spacer>
+          <h2 class="mr-10">To Date</h2>
+        </v-row>
+        <v-row class="mb-4">
+        <v-date-picker dark class="ml-10"  color ="#1C0A00" v-model="from"></v-date-picker>
+        <v-spacer></v-spacer>
+        <v-date-picker class="mr-10" dark color ="#1C0A00"  v-model="to"></v-date-picker>
         </v-row>
       </div>
+      <div  class="ml-7 my-2" v-if="show">
+        <h1>Evaluation</h1>
+      </div>
+      <div class="ml-7 mt-1" v-for="stat in statistics" :key="stat" >
+        <h3> {{stat}} </h3>
+      </div>
+      
     </v-main>
   </v-app>
 </template>
 
 <script>
 import axios from 'axios'
+import Header from './components/Header.vue';
 
 export default {
   name: 'App',
 
   components: {
-      
+    Header
   },
 
   data() {
@@ -37,6 +42,7 @@ export default {
       from : "",
       to : "",
       statistics : [],
+      show : false,
     };
   },
   methods:{
@@ -50,6 +56,7 @@ export default {
         .then((response) => {
             console.log(response.data)
             this.statistics = response.data
+            this.show = true
         })
         .catch((error) => {
           console.log(error)
