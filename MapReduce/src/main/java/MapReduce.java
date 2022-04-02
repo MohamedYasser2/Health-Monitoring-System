@@ -1,27 +1,28 @@
 import java.io.IOException;
-        import java.util.StringTokenizer;
-        import org.apache.hadoop.io.IntWritable;
-        import org.apache.hadoop.io.LongWritable;
-        import org.apache.hadoop.io.Text;
-        import org.apache.hadoop.mapred.MapReduceBase;
-        import org.apache.hadoop.mapreduce.Mapper;
-        import org.apache.hadoop.mapreduce.Reducer;
-        import org.apache.hadoop.conf.Configuration;
-        import org.apache.hadoop.mapreduce.Job;
-        import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-        import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-        import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-        import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-        import org.apache.hadoop.fs.Path;
+import java.util.StringTokenizer;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.fs.Path;
 
 public class MapReduce{
     public static class Map extends Mapper<LongWritable,Text,Text,IntWritable> {
-        public void map(LongWritable key, Text value,Context context) throws IOException,InterruptedException{
-            String line = value.toString();
-            StringTokenizer tokenizer = new StringTokenizer(line);
-            while (tokenizer.hasMoreTokens()) {
-                value.set(tokenizer.nextToken());
-                context.write(value, new IntWritable(1));
+        public void map(LongWritable key, Message value,Context context) throws IOException,InterruptedException{
+            values val = new values(value.getCpu(),value.getDisk().total,value.getRam().total,value.getTimeStamp());
+            context.write(new Text(value.serviceName),val);
+//            String line = value.toString();
+//            StringTokenizer tokenizer = new StringTokenizer(line);
+//            while (tokenizer.hasMoreTokens()) {
+//                value.set(tokenizer.nextToken());
+//                context.write(value, new IntWritable(1));
             }
         }
     }
