@@ -1,43 +1,63 @@
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.annotations.SerializedName;
 
 public class Message {
     @SerializedName("serviceName")
     String serviceName;
     @SerializedName("Timestamp")
-    Long timeStamp;
+    Long Timestamp;
     @SerializedName("CPU")
-    Double cpu;
+    Double CPU;
     @SerializedName("RAM")
-    Ram ram;
-    @SerializedName("DISK")
-    Disk disk;
+    Ram RAM;
+    @SerializedName("Disk")
+    Disk Disk;
 
 
-    public Message(String serviceName, Long timeStamp, Double cpu, Ram ram,Disk disk) {
+    public Message(String serviceName, Long Timestamp, Double CPU, Ram RAM, Disk Disk) {
         this.serviceName = serviceName;
-        this.timeStamp = timeStamp;
-        this.cpu = cpu;
-        this.ram = ram;
-        this.disk=disk;
+        this.Timestamp = Timestamp;
+        this.CPU = CPU;
+        this.RAM = RAM;
+        this.Disk = Disk;
     }
 
-    public Disk getDisk() {
-        return disk;
-    }
-
+    @JsonProperty("serviceName")
     public String getServiceName() {
         return serviceName;
     }
 
+    @JsonProperty("Timestamp")
     public Long getTimeStamp() {
-        return timeStamp;
+        return Timestamp;
     }
 
+    @JsonProperty("CPU")
     public Double getCpu() {
-        return cpu;
+        return CPU;
     }
 
+    @JsonProperty("RAM")
     public Ram getRam() {
-        return ram;
+        return RAM;
+    }
+
+    public String toJsonString() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writeValueAsString(this);
+            return json;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    @JsonProperty("Disk")
+    public Disk getDisk() {
+        return Disk;
     }
 }

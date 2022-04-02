@@ -1,3 +1,5 @@
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 import net.minidev.json.JSONValue;
 
@@ -5,10 +7,20 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Ram {
+    @JsonProperty("Total")
+    public Double getTotal() {
+        return total;
+    }
+
+    @JsonProperty("Free")
+    public double getFree() {
+        return free;
+    }
+
     @SerializedName("Total")
     Double total;
     @SerializedName("Free")
-    Double free;
+    double free;
 
     public Ram(Double total, Double free) {
         this.total = total;

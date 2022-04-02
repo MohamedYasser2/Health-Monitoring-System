@@ -1,3 +1,5 @@
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 import net.minidev.json.JSONValue;
 
@@ -15,6 +17,7 @@ public class Disk {
         this.free = free;
     }
 
+
     public String toJsonString() {
         Map jsonObject=new LinkedHashMap();
         jsonObject.put("Total", this.total);
@@ -23,4 +26,13 @@ public class Disk {
         return jsonText;
     }
 
+    @JsonProperty("Total")
+    public Double getTotal() {
+        return total;
+    }
+
+    @JsonProperty("Free")
+    public Double getFree() {
+        return free;
+    }
 }

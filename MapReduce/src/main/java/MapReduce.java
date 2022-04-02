@@ -3,41 +3,39 @@ import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.fs.Path;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class MapReduce{
-    public static class Map extends MapReduceBase implements Mapper<LongWritable,Text,Text,IntWritable> {
+    public static class Map extends MapReduceBase implements Mapper<LongWritable,Text,Text,ArrayWritable> {
 
         @Override
-        public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
+        public void map(LongWritable key, Text value, OutputCollector<Text, ArrayWritable> output, Reporter reporter) throws IOException {
             System.out.println(value);
             Type listType = new TypeToken<List<Message>>() {}.getType();
             List<Message> messages = new Gson().fromJson(value.toString(), listType);
-            System.out.println(messages.size());
-            System.out.println(messages.get(0).serviceName);
             for (Message message : messages) {
-                values val = new values(message.getCpu(),message.getDisk().total,message.getRam().total,message.getTimeStamp());
-                output.collect(new Text(message.serviceName), new IntWritable(1));
+                Writable[] writables = new Writable[]{new DoubleWritable(message.getCpu()), new DoubleWritable(message.getDisk().getTotal()), new DoubleWritable(message.getRam().getTotal()), new LongWritable(message.getTimeStamp())};
+                output.collect(new Text(message.serviceName), new ArrayWritable(ArrayWritable.class, writables));
+
             }
         }
     }
-    public static class Reduce extends MapReduceBase implements Reducer<Text, IntWritable, Text, IntWritable> {
+
+    public static class Reduce extends MapReduceBase implements Reducer<Text, ArrayWritable, Text, ArrayWritable> {
 
         @Override
-        public void reduce(Text key, Iterator<IntWritable> values, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
+        public void reduce(Text key, Iterator<ArrayWritable> values, OutputCollector<Text, ArrayWritable> output, Reporter reporter) throws IOException {
             System.out.println("Reducing");
-            double cpuSum=0;
-            double diskSum=0;
-            double ramSum=0;
-            double serviceSum=0;
+            double cpuSum = 0;
+            double diskSum = 0;
+            double ramSum = 0;
+            double serviceSum = 0;
             Long time = null;
-//            while (values.hasNext()) {
+            while (values.hasNext()) {
                 System.out.println(values);
 //                cpuSum +=  values.next().getCpu();
 //                diskSum += values.next().getDisk();
@@ -49,23 +47,24 @@ public class MapReduce{
 //            ramSum = ramSum/serviceSum;
 //            values v = new values(cpuSum,diskSum,ramSum,time,serviceSum);
 //            output.collect(key, v);
+            }
         }
-    }
-    public static void main(String[] args) throws Exception {
-        JobConf conf = new JobConf(Message.class);
-        conf.setJobName("Utilization");
-        conf.setOutputKeyClass(Text.class);
-        conf.setOutputValueClass(IntWritable.class);
-        conf.setMapperClass(Map.class);
-        conf.setCombinerClass(Reduce.class);
-        conf.setReducerClass(Reduce.class);
 
-        conf.setInputFormat(TextInputFormat.class);
-        conf.setOutputFormat(TextOutputFormat.class);
+        public static void main(String[] args) throws Exception {
+            JobConf conf = new JobConf(Message.class);
+            conf.setJobName("Utilization");
+            conf.setOutputKeyClass(Text.class);
+            conf.setOutputValueClass(ArrayWritable.class);
+            conf.setMapperClass(Map.class);
+            conf.setCombinerClass(Reduce.class);
+            conf.setReducerClass(Reduce.class);
 
-        FileInputFormat.setInputPaths(conf, new Path("hdfs://hadoop-master:9000/"));
-        FileOutputFormat.setOutputPath(conf, new Path("hdfs://hadoop-master:9000/output/"));
-        JobClient.runJob(conf);
+            conf.setInputFormat(TextInputFormat.class);
+            conf.setOutputFormat(TextOutputFormat.class);
+
+            FileInputFormat.setInputPaths(conf, new Path("hdfs://hadoop-master:9000/"));
+            FileOutputFormat.setOutputPath(conf, new Path("hdfs://hadoop-master:9000/output/"));
+            JobClient.runJob(conf);
 //        final String HDFS_ROOT_URL = "hdfs://hadoop-master:9000";
 //        Configuration conf = new Configuration();
 //        FileSystem.get(URI.create(HDFS_ROOT_URL),conf);
@@ -89,5 +88,6 @@ public class MapReduce{
 //        System.out.println(success);
 //        //exiting the job only if the flag value becomes false
 //        System.exit(success ? 0 : 1);
+        }
     }
 }
