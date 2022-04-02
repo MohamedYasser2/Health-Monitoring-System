@@ -39,8 +39,8 @@ public class HealthMessageGenerator implements IHealthMessageGenerator{
     @Override
     public String generateRam() {
         Random rand = new Random();
-        int total = rand.nextInt(64);
-        float free = rand.nextFloat() * (64) + 0;
+        Double total = rand.nextDouble();
+        Double free = rand.nextDouble() * (64) + 0;
         Ram ram = new Ram(total, free);
         return ram.toJsonString();
     }
@@ -48,8 +48,8 @@ public class HealthMessageGenerator implements IHealthMessageGenerator{
     @Override
     public String generateDisk() {
         Random rand = new Random();
-        int total = rand.nextInt(1000);
-        int free = rand.nextInt(1000);
+        double total = rand.nextDouble();
+        double free = rand.nextDouble();
         Disk disk = new Disk(total, free);
         return disk.toJsonString();
     }

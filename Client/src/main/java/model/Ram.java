@@ -1,15 +1,18 @@
 package model;
 
+import com.google.gson.annotations.SerializedName;
 import org.json.simple.JSONValue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Disk {
-    int total;
-    int free;
+public class Ram {
+    @SerializedName("Total")
+    Double total;
+    @SerializedName("Free")
+    double free;
 
-    public Disk(int total, int free) {
+    public Ram(Double total, Double free) {
         this.total = total;
         this.free = free;
     }
