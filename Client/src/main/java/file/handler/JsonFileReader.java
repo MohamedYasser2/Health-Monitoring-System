@@ -5,5 +5,4 @@ public class JsonFileReader {
         public static String readFileAsString(String file) throws Exception {
             return new String(Files.readAllBytes(Paths.get(file)));
         }
-
 }
