@@ -22,8 +22,8 @@ public class MapReduce{
 //            StringTokenizer tokenizer = new StringTokenizer(line);
 //            while (tokenizer.hasMoreTokens()) {
 //                value.set(tokenizer.nextToken());
-//                context.write(value, new IntWritable(1));
-            }
+//                context.write(value, new IntWritable(1))
+//            }
         }
     }
     public static class Reduce extends Reducer<Text,IntWritable,Text,IntWritable> {
