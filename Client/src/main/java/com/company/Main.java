@@ -18,6 +18,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         int counter = 0;
         while(true) {
+            System.out.println("Sending from file number " + counter);
             String file = "/media/hadoopuser/College/College Labs/Big Data Systems/health_data/health_" + counter + ".json";
             String json = readFileAsString(file);
             String replacedString = json.replaceAll("}\\{", "},{");

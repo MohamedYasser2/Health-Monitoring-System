@@ -14,7 +14,7 @@ public class TestConnection {
         Configuration conf = new Configuration();
         FileSystem fileSystem = FileSystem.get(new URI("hdfs://hadoop-master:9000"),conf);
         LocalDate date = LocalDate.now();
-        String directoryName = "/"+date.toString()+"/data.log";
+        String directoryName = "/"+ date +"/data.log";
         Path path = new Path(directoryName);
         fileSystem.mkdirs(path);
         if(fileSystem instanceof DistributedFileSystem) {

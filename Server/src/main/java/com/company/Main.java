@@ -30,7 +30,7 @@ public class Main {
             Configuration conf = new Configuration();
             FileSystem hdfs = FileSystem.get(new URI("hdfs://hadoop-master:9000"),conf);
             LocalDate date = LocalDate.now();
-            Path file = new Path("hdfs://hadoop-master:9000/" + "batch " + counter + ".log");
+            Path file = new Path("hdfs://hadoop-master:9000/" + "batch_" + counter + ".log");
             if ( hdfs.exists( file )) {
                 out.println("file is found");
                 long start = System.nanoTime();
