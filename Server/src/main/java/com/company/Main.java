@@ -22,7 +22,7 @@ public class Main {
         int port = 3500;
         DatagramSocket socket = new DatagramSocket(port);
         out.println("Waiting....");
-
+        int counter = 0;
         while(true){
             long Totalstart = System.nanoTime();
             ArrayList<String> messages = messageBatch(socket);
@@ -30,7 +30,7 @@ public class Main {
             Configuration conf = new Configuration();
             FileSystem hdfs = FileSystem.get(new URI("hdfs://hadoop-master:9000"),conf);
             LocalDate date = LocalDate.now();
-            Path file = new Path("hdfs://hadoop-master:9000/" + date + ".log");
+            Path file = new Path("hdfs://hadoop-master:9000/" + "batch " + counter + ".log");
             if ( hdfs.exists( file )) {
                 out.println("file is found");
                 long start = System.nanoTime();
@@ -55,6 +55,7 @@ public class Main {
                 out.println("Time taken to write data to hadoop is " + elapsedTimeInSecond + " seconds");
                 out.println("Created succesfully");
             }
+            counter++;
             long finish = System.nanoTime();
             long timeElapsed = finish - Totalstart;
             double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;

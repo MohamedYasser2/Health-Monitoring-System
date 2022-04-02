@@ -1,5 +1,5 @@
 import com.google.gson.annotations.SerializedName;
-import org.json.simple.JSONValue;
+import net.minidev.json.JSONValue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
