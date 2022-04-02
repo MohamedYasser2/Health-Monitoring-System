@@ -5,14 +5,20 @@ public class values extends IntWritable {
     private double disk;
     private double ram;
     private Long time;
-
+    private double count;
     public values(double cpu, double disk, double ram, Long time) {
         this.cpu = cpu;
         this.disk = disk;
         this.ram = ram;
         this.time = time;
     }
-
+    public values(double cpu, double disk, double ram, Long time,double count) {
+        this.cpu = cpu;
+        this.disk = disk;
+        this.ram = ram;
+        this.time = time;
+        this.count = count;
+    }
     public void setCpu(double cpu) {
         this.cpu = cpu;
     }
@@ -28,7 +34,7 @@ public class values extends IntWritable {
     public void setTime(Long time) {
         this.time = time;
     }
-
+    public void setCount(double count){this.count=count;}
     public double getCpu() {
         return cpu;
     }
@@ -44,4 +50,6 @@ public class values extends IntWritable {
     public Long getTime() {
         return time;
     }
+    public double getCount(){return count;}
+
 }

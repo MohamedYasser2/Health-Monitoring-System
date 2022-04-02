@@ -27,18 +27,25 @@ public class MapReduce{
         }
     }
     public static class Reduce extends Reducer<Text,IntWritable,Text,IntWritable> {
-        public void reduce(Text key, Iterable<IntWritable> values,Context context) throws IOException,InterruptedException {
-            int sum=0;
-            for(IntWritable x: values)
-            {
-                sum+=x.get();
+        public void reduce(Text key, Iterable<values> values,Context context) throws IOException,InterruptedException {
+            double cpuSum=0;double diskSum=0;double ramSum=0;
+            double serviceSum=0;Long time = null;
+            for(values x: values) {
+                cpuSum += x.getCpu();
+                diskSum +=x.getDisk();
+                ramSum +=x.getRam();
+                serviceSum++;
             }
-            context.write(key, new IntWritable(sum));
+            cpuSum = cpuSum/serviceSum;
+            diskSum = diskSum/serviceSum;
+            ramSum = ramSum/serviceSum;
+            values v = new values(cpuSum,diskSum,ramSum,time,serviceSum);
+            context.write(key, v);
         }
     }
     public static void main(String[] args) throws Exception {
         Configuration conf= new Configuration();
-        Job job = new Job(conf,"My Word Count Program");
+        Job job = new Job(conf,"File Utilization Program");
         job.setJarByClass(MapReduce.class);
         job.setMapperClass(Map.class);
         job.setReducerClass(Reduce.class);
