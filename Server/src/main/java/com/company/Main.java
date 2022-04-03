@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import static java.lang.System.out;
 
 public class Main {
-    private static int msgNo = 1024;
+    private static Integer msgNo = Integer.MAX_VALUE;
 
     public static void main(String[] args) throws IOException, URISyntaxException {
 	    //establish connection
@@ -30,7 +30,7 @@ public class Main {
             Configuration conf = new Configuration();
             FileSystem hdfs = FileSystem.get(new URI("hdfs://hadoop-master:9000"),conf);
             LocalDate date = LocalDate.now();
-            Path file = new Path("hdfs://hadoop-master:9000/" + "batch_" + counter + ".log");
+            Path file = new Path("hdfs://hadoop-master:9000/" + "batch_1" + ".log");
             if ( hdfs.exists( file )) {
                 out.println("file is found");
                 long start = System.nanoTime();

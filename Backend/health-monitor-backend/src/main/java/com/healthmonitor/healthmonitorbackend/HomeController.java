@@ -4,18 +4,19 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IOUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 
-import static com.healthmonitor.healthmonitorbackend.HomeController.HDFSDemo.HDFS_ROOT_URL;
+import static com.healthmonitor.healthmonitorbackend.MapReduce.runJob;
+import static java.lang.Character.isDigit;
+
 
 @RestController
 @RequestMapping("/api")
@@ -23,15 +24,28 @@ import static com.healthmonitor.healthmonitorbackend.HomeController.HDFSDemo.HDF
 public class HomeController {
     @GetMapping("/getstatistics")
     public ArrayList<String> getStatistics(@RequestParam String startDate, @RequestParam String endDate) throws Exception {
-        System.out.println("I am hereeeeeee");
         ArrayList<String> test = new ArrayList<>();
         test.add(startDate);
         test.add(endDate);
+        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+        long fromDateTime = 0;
+        long toDateTime = 0;
+        try {
+            Date fromDate = f.parse(startDate);
+            fromDateTime = fromDate. getTime();
+            System.out.println(fromDateTime);
+            Date toDate = f.parse(endDate);
+            toDateTime = toDate. getTime();
+            System.out.println(toDateTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        runJob(fromDateTime, toDateTime);
         HDFSDemo demo = new HDFSDemo();
-        String path = "/batch_0.log";
+        String path = "/output/part-00000";
         String content = demo.printHDFSFileContents(path);
-        System.out.println(content);
-        return test;
+        System.out.println(parse(content));
+        return parse(content);
     }
 
     public class HDFSDemo {
@@ -59,5 +73,24 @@ public class HomeController {
             return builder.toString();
         }
     }
+
+    public static ArrayList<String> parse(String st){
+        String s = st.replace("\tArrayWritable ","");
+        s=s.replace("valueClass=class org.apache.hadoop.io.Text, values=","");
+        s=s.replace("service-","");
+        ArrayList<String> list = new ArrayList<>();
+        StringBuilder builder = new StringBuilder();
+        for (int i =0; i<s.length();i++){
+            char c = s.charAt(i);
+            if(isDigit(c) || c=='.'){
+                builder.append(c);
+            }
+            else {
+                if (!builder.toString().equals(""))
+                    list.add(builder.toString());
+                builder = new StringBuilder();
+            }
+        }
+        return list;
+    }
 }
-//

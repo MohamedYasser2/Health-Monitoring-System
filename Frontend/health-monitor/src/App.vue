@@ -64,6 +64,7 @@ export default {
                 if(j == this.statistics.length)
                     break;
             }
+
             this.show = true
         })
         .catch((error) => {
