@@ -18,8 +18,8 @@
       <div  class="ml-7 my-2" v-if="show">
         <h1>Evaluation</h1>
       </div>
-      <div class="ml-7 mt-1" v-for="stat in statistics" :key="stat" >
-        <h3> {{stat}} </h3>
+      <div class="ml-7 mt-1" v-for="stat in evaluation" :key="stat" >
+        <p> {{stat}} </p>
       </div>
       
     </v-main>
@@ -43,6 +43,7 @@ export default {
       to : "",
       statistics : [],
       show : false,
+      evaluation:[],
     };
   },
   methods:{
@@ -56,6 +57,13 @@ export default {
         .then((response) => {
             console.log(response.data)
             this.statistics = response.data
+            let j=0
+            for (let i = 0; i < this.statistics.length; i ++) {
+                this.evaluation[i] ="Service Name : "+this.statistics[j] + "    -Mean CPU : " +this.statistics[j+1]+"    -Mean Disk : "+this.statistics[j+2]+"    -Mean Ram : "+this.statistics[j+3];
+                j+=4
+                if(j == this.statistics.length)
+                    break;
+            }
             this.show = true
         })
         .catch((error) => {
