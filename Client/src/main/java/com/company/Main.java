@@ -31,7 +31,7 @@ public class Main {
             System.out.println(messages.get(0).toJsonString());
 
             for (int i = 0; i < messages.size(); i++) {
-                send_packet(messages.get(i).toJsonString());
+                send_packet(messages.get(i).toJsonString() + "\n");
                 System.out.println("Sending packet " + i);
                 i++;
                 Thread.sleep(10);

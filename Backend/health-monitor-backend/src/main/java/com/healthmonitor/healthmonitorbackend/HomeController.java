@@ -16,6 +16,7 @@ import java.util.Date;
 
 import static com.healthmonitor.healthmonitorbackend.MapReduce.runJob;
 import static java.lang.Character.isDigit;
+import static java.lang.System.out;
 
 
 @RestController
@@ -33,18 +34,25 @@ public class HomeController {
         try {
             Date fromDate = f.parse(startDate);
             fromDateTime = fromDate. getTime();
-            System.out.println(fromDateTime);
+            out.println(fromDateTime);
             Date toDate = f.parse(endDate);
             toDateTime = toDate. getTime();
-            System.out.println(toDateTime);
+            out.println(toDateTime);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        runJob(fromDateTime, toDateTime);
+        long Totalstart = System.nanoTime();
+       runJob(fromDateTime, toDateTime);
+        long finish = System.nanoTime();
+        long timeElapsed = finish - Totalstart;
+        double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
+        out.println("Time is  " + elapsedTimeInSecond + " seconds");
+        out.println("Time is  " + elapsedTimeInSecond / 60 + " Minutes");
+        out.println("Throuput is " + (10000 * 215) / elapsedTimeInSecond + " records/second");
         HDFSDemo demo = new HDFSDemo();
         String path = "/output/part-00000";
         String content = demo.printHDFSFileContents(path);
-        System.out.println(parse(content));
+        out.println(parse(content));
         return parse(content);
     }
 

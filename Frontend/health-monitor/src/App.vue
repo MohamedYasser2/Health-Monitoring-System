@@ -59,8 +59,8 @@ export default {
             this.statistics = response.data
             let j=0
             for (let i = 0; i < this.statistics.length; i ++) {
-                this.evaluation[i] ="Service Name : "+this.statistics[j] + "    -Mean CPU : " +this.statistics[j+1]+"    -Mean Disk : "+this.statistics[j+2]+"    -Mean Ram : "+this.statistics[j+3];
-                j+=4
+                this.evaluation[i] ="Service Name : "+this.statistics[j] + "    -Mean CPU : " + this.statistics[j+1]+ "    -Mean Disk : "+this.statistics[j+2]+"    -Mean Ram : "+this.statistics[j+3] +"    -Peak Utilization Time : "+this.statistics[j+4] + "    -Number of messages of service : "+this.statistics[j+5];
+                j+=6
                 if(j == this.statistics.length)
                     break;
             }

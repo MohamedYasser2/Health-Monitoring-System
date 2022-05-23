@@ -65,7 +65,7 @@ public class MapReduce{
             Double diskSum = Double.valueOf(0);
             Double ramSum = Double.valueOf(0);
             Double serviceSum = Double.valueOf(0);
-            Long time = null;
+            Long time = 0L;
             TextArrayWritable tmp;
             while (values.hasNext()) {
                 tmp = values.next();
@@ -74,11 +74,12 @@ public class MapReduce{
                 diskSum += (Double.parseDouble(strings[1]));
                 ramSum += (Double.parseDouble(strings[2]));
                 serviceSum++;
+                time = Math.max(Long.parseLong(strings[3]), time);
             }
             cpuSum = cpuSum/serviceSum;
             diskSum = diskSum/serviceSum;
             ramSum = ramSum/serviceSum;
-            String[] strings = new String[] {cpuSum.toString(), diskSum.toString(), ramSum.toString()};
+            String[] strings = new String[] {cpuSum.toString(), diskSum.toString(), ramSum.toString(), time.toString(), serviceSum.toString()};
             output.collect(key, new TextArrayWritable(strings));
         }
     }
@@ -97,7 +98,7 @@ public class MapReduce{
         System.out.println(endDate);
         conf.set("startDate", startDate.toString());
         conf.set("endDate", endDate.toString());
-        FileInputFormat.setInputPaths(conf, new Path("hdfs://hadoop-master:9000/"));
+        FileInputFormat.setInputPaths(conf, new Path("hdfs://hadoop-master:9000/input/"));
         FileOutputFormat.setOutputPath(conf, new Path("hdfs://hadoop-master:9000/output/"));
         JobClient.runJob(conf);
     }
