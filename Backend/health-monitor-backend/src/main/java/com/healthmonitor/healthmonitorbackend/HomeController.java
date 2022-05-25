@@ -4,6 +4,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.util.ToolRunner;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
@@ -33,72 +34,99 @@ public class HomeController {
         long toDateTime = 0;
         try {
             Date fromDate = f.parse(startDate);
-            fromDateTime = fromDate. getTime();
+            fromDateTime = fromDate.getTime();
             out.println(fromDateTime);
             Date toDate = f.parse(endDate);
-            toDateTime = toDate. getTime();
+            toDateTime = toDate.getTime();
             out.println(toDateTime);
         } catch (ParseException e) {
             e.printStackTrace();
         }
         long Totalstart = System.nanoTime();
-       runJob(fromDateTime, toDateTime);
+        String[] args = new String[0];
+        Path output = new Path("/outputs");
+        Configuration conf = new Configuration();
+        FileSystem hdfs = FileSystem.get(URI.create("hdfs://hadoop-master:9000"),conf);
+
+        // delete existing directory
+        if (hdfs.exists(output)) {
+            hdfs.delete(output, true);
+        }
+        output = new Path("/outputs1");
+        if (hdfs.exists(output)) {
+            hdfs.delete(output, true);
+        }
+        AlphaCounter alphaCounter = new AlphaCounter();
+        alphaCounter.run(args);
+        ParquetConvert parquetConvert = new ParquetConvert();
+        parquetConvert.run(args);
+        output = new Path("/outputs");
+        if (hdfs.exists(output)) {
+            hdfs.delete(output, true);
+        }
+
+
+
+
+//        runJob(fromDateTime, toDateTime);
         long finish = System.nanoTime();
         long timeElapsed = finish - Totalstart;
         double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
         out.println("Time is  " + elapsedTimeInSecond + " seconds");
         out.println("Time is  " + elapsedTimeInSecond / 60 + " Minutes");
         out.println("Throuput is " + (10000 * 215) / elapsedTimeInSecond + " records/second");
-        HDFSDemo demo = new HDFSDemo();
-        String path = "/output/part-00000";
-        String content = demo.printHDFSFileContents(path);
-        out.println(parse(content));
-        return parse(content);
-    }
-
-    public class HDFSDemo {
-        public static final String HDFS_ROOT_URL = "hdfs://hadoop-master:9000";
-        private Configuration conf;
-
-        public HDFSDemo() {
-            conf = new Configuration();
-        }
-
-        // Example - Print hdfs file contents to console using Java
-        public String printHDFSFileContents(String filePath) throws Exception {
-            FileSystem fs = FileSystem.get(URI.create(HDFS_ROOT_URL),conf);
-            Path path = new Path(filePath);
-            FSDataInputStream in = fs.open(path);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String line = null;
-            StringBuilder builder = new StringBuilder();
-            while((line = br.readLine())!= null){
-                builder.append(line);
-            }
-            in.close();
-            br.close();
-            fs.close();
-            return builder.toString();
-        }
-    }
-
-    public static ArrayList<String> parse(String st){
-        String s = st.replace("\tArrayWritable ","");
-        s=s.replace("valueClass=class org.apache.hadoop.io.Text, values=","");
-        s=s.replace("service-","");
-        ArrayList<String> list = new ArrayList<>();
-        StringBuilder builder = new StringBuilder();
-        for (int i =0; i<s.length();i++){
-            char c = s.charAt(i);
-            if(isDigit(c) || c=='.'){
-                builder.append(c);
-            }
-            else {
-                if (!builder.toString().equals(""))
-                    list.add(builder.toString());
-                builder = new StringBuilder();
-            }
-        }
-        return list;
+//        HDFSDemo demo = new HDFSDemo();
+//        String path = "/outputs/part-r-00000";
+//        String content = demo.printHDFSFileContents(path);
+//        out.println(parse(content));
+//        return parse(content);
+        return new ArrayList<>();
     }
 }
+
+//    public class HDFSDemo {
+//        public static final String HDFS_ROOT_URL = "hdfs://hadoop-master:9000";
+//        private Configuration conf;
+//
+//        public HDFSDemo() {
+//            conf = new Configuration();
+//        }
+//
+//        // Example - Print hdfs file contents to console using Java
+//        public String printHDFSFileContents(String filePath) throws Exception {
+//            FileSystem fs = FileSystem.get(URI.create(HDFS_ROOT_URL),conf);
+//            Path path = new Path(filePath);
+//            FSDataInputStream in = fs.open(path);
+//            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+//            String line = null;
+//            StringBuilder builder = new StringBuilder();
+//            while((line = br.readLine())!= null){
+//                builder.append(line);
+//            }
+//            in.close();
+//            br.close();
+//            fs.close();
+//            return builder.toString();
+//        }
+//    }
+//
+//    public static ArrayList<String> parse(String st){
+//        String s = st.replace("\tArrayWritable ","");
+//        s=s.replace("valueClass=class org.apache.hadoop.io.Text, values=","");
+//        s=s.replace("service-","");
+//        ArrayList<String> list = new ArrayList<>();
+//        StringBuilder builder = new StringBuilder();
+//        for (int i =0; i<s.length();i++){
+//            char c = s.charAt(i);
+//            if(isDigit(c) || c=='.'){
+//                builder.append(c);
+//            }
+//            else {
+//                if (!builder.toString().equals(""))
+//                    list.add(builder.toString());
+//                builder = new StringBuilder();
+//            }
+//        }
+//        return list;
+//    }
+//}

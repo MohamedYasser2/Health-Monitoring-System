@@ -8,13 +8,10 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +31,7 @@ public class Main {
 
         while(true){
             long Totalstart = System.nanoTime();
+            out.println("Reading file " + dataCounter);
             String dataFile = "/media/hadoopuser/College/College Labs/Big Data Systems/health_data/health_" + dataCounter + ".json";
             String json = readFileAsString(dataFile);
             String replacedString = json.replaceAll("}\\{", "},{");
@@ -55,16 +53,15 @@ public class Main {
             conf.set("dfs.replication", "1");
             FileSystem hdfs = FileSystem.get(new URI("hdfs://hadoop-master:9000"),conf);
 //            LocalDate date = LocalDate.now();
-            Path file = new Path("hdfs://hadoop-master:9000/input/" + "data_" + hadoopCounter + ".csv");
+            Path file = new Path("hdfs://hadoop-master:9000/inputs/" + "data_" + hadoopCounter + ".csv");
             if ( hdfs.exists( file )) {
                 out.println("file is found");
                 long start = System.nanoTime();
                 OutputStream os = hdfs.append(file);
                 BufferedWriter br = new BufferedWriter( new OutputStreamWriter( os, "UTF-8" ) );
                 for (int i = 0; i < clientMessages.size(); i++) {
-                    br.write(clientMessages.get(i).getServiceName() + "," + clientMessages.get(i).getCpu() + "," + clientMessages.get(i).getRam().getTotal() + "," + clientMessages.get(i).getRam().getFree() + "," + clientMessages.get(i).getDisk().getTotal() + "," + clientMessages.get(i).getDisk().getFree());
+                    br.write(clientMessages.get(i).getTimeStamp() + "," + clientMessages.get(i).getServiceName() + "," + clientMessages.get(i).getCpu() + "," + clientMessages.get(i).getRam().getTotal() + "," + clientMessages.get(i).getRam().getFree() + "," + clientMessages.get(i).getDisk().getTotal() + "," + clientMessages.get(i).getDisk().getFree());
                 }
-//                br.write(messages.toString());
                 br.close();
                 long finish = System.nanoTime();
                 long timeElapsed = finish - start;
@@ -78,12 +75,11 @@ public class Main {
 
                 Type typeList = new TypeToken<List<Message>>() {}.getType();
                 for (int i = 0; i < clientMessages.size() - 1; i++) {
-                        br.write(clientMessages.get(i).getServiceName() + "," + clientMessages.get(i).getCpu() + "," + clientMessages.get(i).getRam().getTotal() + "," + clientMessages.get(i).getRam().getFree() + "," + clientMessages.get(i).getDisk().getTotal() + "," + clientMessages.get(i).getDisk().getFree() + "\n");
+                        br.write(clientMessages.get(i).getTimeStamp() + "," + clientMessages.get(i).getServiceName() + "," + clientMessages.get(i).getCpu() + "," + clientMessages.get(i).getRam().getTotal() + "," + clientMessages.get(i).getRam().getFree() + "," + clientMessages.get(i).getDisk().getTotal() + "," + clientMessages.get(i).getDisk().getFree() + "\n");
                 }
-                br.write(clientMessages.get(clientMessages.size() - 1).getServiceName() + "," + clientMessages.get(clientMessages.size() - 1).getCpu() + "," + clientMessages.get(clientMessages.size() - 1).getRam().getTotal() + "," + clientMessages.get(clientMessages.size() - 1).getRam().getFree() + "," + clientMessages.get(clientMessages.size() - 1).getDisk().getTotal() + "," + clientMessages.get(clientMessages.size() - 1).getDisk().getFree() + "\n");
+                br.write( clientMessages.get(clientMessages.size() - 1).getTimeStamp() + "," +clientMessages.get(clientMessages.size() - 1).getServiceName() + "," + clientMessages.get(clientMessages.size() - 1).getCpu() + "," + clientMessages.get(clientMessages.size() - 1).getRam().getTotal() + "," + clientMessages.get(clientMessages.size() - 1).getRam().getFree() + "," + clientMessages.get(clientMessages.size() - 1).getDisk().getTotal() + "," + clientMessages.get(clientMessages.size() - 1).getDisk().getFree() + "\n");
 
                 br.close();
-                //                    br.write(messages.toString());
 
                 long finish = System.nanoTime();
                 long timeElapsed = finish - start;
@@ -99,8 +95,6 @@ public class Main {
 //            out.println("Total throughput is " + 1024 / elapsedTimeInSecond + " records/second");
             hdfs.close();
         }
-        //close connection
-        //socket.close();
 
     }
     public static String receive_packet(DatagramSocket socket) throws IOException {
@@ -110,11 +104,6 @@ public class Main {
         socket.receive(packet);
 
         String s = new String(packet.getData(),0,packet.getLength());
-          //System.out.println("The Message is " + s );
-//        InetAddress clientAddress = packet.getAddress();
-//        int clientPort = packet.getPort();
-//        System.out.println("Client address : " + clientAddress);
-//        System.out.println("Client port : " + clientPort);
         return s;
     }
     public static ArrayList<String> messageBatch(DatagramSocket socket) throws IOException {

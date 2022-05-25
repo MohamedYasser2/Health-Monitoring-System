@@ -1,59 +1,52 @@
 package com.healthmonitor.healthmonitorbackend;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Iterator;
-import java.util.List;
 
+
+
+import java.io.IOException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import org.apache.flink.api.java.hadoop.mapred.HadoopOutputFormat;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.fs.Path;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-public class MapReduce{
-    public static class Map extends MapReduceBase implements Mapper<LongWritable,Text,Text,ArrayWritable> {
-        Long startDate;
-        Long endDate;
+
+public class MapReduce {
+    public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, ArrayWritable> {
+        //Long startDate;
+        //Long endDate;
         @Override
         public void configure(JobConf job) {
             super.configure(job);
-            startDate = job.getLong("startDate", -1);
+            //   startDate = job.getLong("startDate", -1);
             // nb: last arg is the default value if option is not set
-            endDate = job.getLong("endDate", -1);
-            System.out.println(startDate);
-            System.out.println(endDate);
+            //   endDate = job.getLong("endDate", -1);
+            //   System.out.println(startDate);
+            //   System.out.println(endDate);
         }
-
 
         @Override
         public void map(LongWritable key, Text value, OutputCollector<Text, ArrayWritable> output, Reporter reporter) throws IOException {
-            Type listType = new TypeToken<List<Message>>() {}.getType();
-            List<Message> messages = new Gson().fromJson(value.toString(), listType);
-
-            for (Message message : messages) {
-                String dateForm = startDate.toString();
-                String messageDateForm = message.getTimeStamp().toString();
-                if (dateForm.length() > messageDateForm.length()) {
-                    for (int i = 0; i < dateForm.length() - messageDateForm.length() + 2; i++) {
-                        messageDateForm += '0';
-                    }
-                }
-                Long messageTime = Long.parseLong(messageDateForm);
-
-                System.out.println("Start Date");
-                System.out.println(startDate);
-                System.out.println("End Date");
-                System.out.println(endDate);
-                System.out.println("Message Date");
-                System.out.println(messageTime);
-                if (messageTime > startDate && messageTime < endDate) {
-                    System.out.println("Mapping");
-                    String[] strings = new String[]{
-                            message.getCpu().toString(), message.getDisk().getTotal().toString(), message.getRam().getTotal().toString(), message.getTimeStamp().toString()};
-                    output.collect(new Text(message.getServiceName()), new TextArrayWritable(strings));
-                }
-            }
+            System.out.println(value);
+            String[] messageFields = value.toString().split(",");
+            String timeStamp = messageFields[0];
+            Long time = Long.parseLong(timeStamp);
+            Date date = new Date(time);
+            Format format = new SimpleDateFormat("yyyy MM dd HH:mm");
+            String dateKey = format.format(date);
+            System.out.println("Mapping");
+            System.out.println(dateKey + "," + messageFields[1]);
+            String[] strings = new String[]{
+                    messageFields[2], messageFields[5], messageFields[3], messageFields[0]};
+            output.collect(new Text(dateKey + "," + messageFields[1]), new TextArrayWritable(strings));
         }
     }
 
@@ -70,21 +63,39 @@ public class MapReduce{
             while (values.hasNext()) {
                 tmp = values.next();
                 String[] strings = tmp.toStrings();
-                cpuSum +=  (Double.parseDouble(strings[0]));
+                cpuSum += (Double.parseDouble(strings[0]));
                 diskSum += (Double.parseDouble(strings[1]));
                 ramSum += (Double.parseDouble(strings[2]));
                 serviceSum++;
                 time = Math.max(Long.parseLong(strings[3]), time);
             }
-            cpuSum = cpuSum/serviceSum;
-            diskSum = diskSum/serviceSum;
-            ramSum = ramSum/serviceSum;
-            String[] strings = new String[] {cpuSum.toString(), diskSum.toString(), ramSum.toString(), time.toString(), serviceSum.toString()};
+            cpuSum = cpuSum / serviceSum;
+            diskSum = diskSum / serviceSum;
+            ramSum = ramSum / serviceSum;
+            String[] strings = new String[]{cpuSum.toString(), diskSum.toString(), ramSum.toString(), time.toString(), serviceSum.toString()};
             output.collect(key, new TextArrayWritable(strings));
         }
     }
 
-    public static void runJob(Long startDate, Long endDate) throws IOException {
+    public static int runJob(Long startDate, Long endDate) throws IOException, InterruptedException, ClassNotFoundException {
+//        Job job = Job.getInstance();
+//
+//        job.setJobName("Utilization");
+//        job.setMapOutputKeyClass(LongWritable.class);
+//        job.setMapOutputValueClass(Text.class);
+//        job.setOutputKeyClass(Text.class);
+//        job.setOutputValueClass(Text.class);
+//        job.setMapperClass(Map.class);
+//        job.setNumReduceTasks(0);
+//
+//        job.setInputFormatClass(TextInputFormat.class);
+//        job.setOutputFormatClass(TextOutputFormat.class);
+//
+//        FileInputFormat.setInputPaths(job, new Path("hdfs://hadoop-master:9000/inputs/"));
+//        FileOutputFormat.setOutputPath(job,new Path("hdfs://hadoop-master:9000/outputs/"));
+//
+//        job.waitForCompletion(true);
+//        return 0;
         JobConf conf = new JobConf(Message.class);
         conf.setJobName("Utilization");
         conf.setOutputKeyClass(Text.class);
@@ -93,14 +104,26 @@ public class MapReduce{
         conf.setCombinerClass(Reduce.class);
         conf.setReducerClass(Reduce.class);
         conf.setInputFormat(TextInputFormat.class);
+        Job job = Job.getInstance();
+
+        // Set up Hadoop Output Format
+//        HadoopOutputFormat hadoopOutputFormat = new HadoopOutputFormat(new AvroParquetOutputFormat(), job);
+
+
+//        AvroParquetOutputFormat.setSchema(job, );
+//        ParquetOutputFormat.setCompression(job, CompressionCodecName.SNAPPY);
+//        ParquetOutputFormat.setEnableDictionary(job, true);
+
+
         conf.setOutputFormat(TextOutputFormat.class);
         System.out.println(startDate);
         System.out.println(endDate);
         conf.set("startDate", startDate.toString());
         conf.set("endDate", endDate.toString());
-        FileInputFormat.setInputPaths(conf, new Path("hdfs://hadoop-master:9000/input/"));
-        FileOutputFormat.setOutputPath(conf, new Path("hdfs://hadoop-master:9000/output/"));
+//        FileInputFormat.setInputPaths(conf, new Path("hdfs://hadoop-master:9000/inputs/"));
+//        FileOutputFormat.setOutputPath(conf, new Path("hdfs://hadoop-master:9000/output/"));
         JobClient.runJob(conf);
+        return 0;
     }
 
     public static class TextArrayWritable extends ArrayWritable {
