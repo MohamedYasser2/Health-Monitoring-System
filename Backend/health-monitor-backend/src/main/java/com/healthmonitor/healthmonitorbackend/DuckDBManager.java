@@ -1,40 +1,26 @@
 package com.healthmonitor.healthmonitorbackend;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class DuckDBManager {
 
-    public void initializeConnection() throws ClassNotFoundException, SQLException {
+    public ArrayList<String> queryBatchView(Long startDate, Long endDate) throws ClassNotFoundException, SQLException {
         Class.forName("org.duckdb.DuckDBDriver");
         Connection conn = DriverManager.getConnection("jdbc:duckdb:/home/hadoopuser/DuckDB/dummy");
-//        con.createAppender("main", "people");
-//        appender.beginRow();
-//        appender.append("Mark");
-//        appender.endRow();
-//        appender.close();
-//
-//        String query = "EXPORT DATABASE 'jdbc:duckdb:/home/hadoopuser/DuckDB/' (FORMAT PARQUET);";
-
+        PreparedStatement prep = conn.prepareStatement("SELECT AVG(maxCPU), AVG(maxRAM), AVG(maxDisk), SUM(count)  FROM '/home/hadoopuser/DuckDB/*.parquet' WHERE stamp BETWEEN ? AND ? GROUP BY serviceName;");
+        prep.setDouble(1, startDate);
+        prep.setDouble(2, endDate);
         Statement stmt = conn.createStatement();
-//        stmt.executeQuery(query);
-
-//        Statement stmt = conn.createStatement();
-        stmt.execute("CREATE TABLE items (item VARCHAR, value DECIMAL(10,2), count INTEGER)");
-        // insert two items into the table
-        stmt.execute("INSERT INTO items VALUES ('jeans', 20.0, 1), ('hammer', 42.2, 2)");
-
-        ResultSet rs = stmt.executeQuery("SELECT * FROM '/home/hadoopuser/DuckDB/Data/*.parquet'");
+        ResultSet rs = prep.executeQuery();
+        System.out.println("here");
+        System.out.println(rs);
+        ArrayList<String> strings = new ArrayList<>();
         while (rs.next()) {
-            System.out.println(rs.getString(1));
+            strings.add("CPU: " + rs.getString(1) + "\tRAM: " + rs.getString(2) + "\tDisk: " + rs.getString(3) + "\tServices Count: " + rs.getString(4));
         }
-
-
-//        ResultSet rs = stmt.executeQuery("SELECT * FROM items");
-//        while (rs.next()) {
-//            System.out.println(rs.getString(1));
-//            System.out.println(rs.getInt(3));
-//        }
-//        rs.close();
+        rs.close();
+        return strings;
     }
 
 }

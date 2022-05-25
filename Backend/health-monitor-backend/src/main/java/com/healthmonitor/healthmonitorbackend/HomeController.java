@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static com.healthmonitor.healthmonitorbackend.MapReduce.runJob;
 import static java.lang.Character.isDigit;
@@ -43,90 +44,35 @@ public class HomeController {
             e.printStackTrace();
         }
         long Totalstart = System.nanoTime();
-        String[] args = new String[0];
-        Path output = new Path("/outputs");
-        Configuration conf = new Configuration();
-        FileSystem hdfs = FileSystem.get(URI.create("hdfs://hadoop-master:9000"),conf);
-
-        // delete existing directory
-        if (hdfs.exists(output)) {
-            hdfs.delete(output, true);
-        }
-        output = new Path("/outputs1");
-        if (hdfs.exists(output)) {
-            hdfs.delete(output, true);
-        }
-        AlphaCounter alphaCounter = new AlphaCounter();
-        alphaCounter.run(args);
-        ParquetConvert parquetConvert = new ParquetConvert();
-        parquetConvert.run(args);
-        output = new Path("/outputs");
-        if (hdfs.exists(output)) {
-            hdfs.delete(output, true);
-        }
-
-
-
-
-//        runJob(fromDateTime, toDateTime);
-        long finish = System.nanoTime();
-        long timeElapsed = finish - Totalstart;
-        double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
-        out.println("Time is  " + elapsedTimeInSecond + " seconds");
-        out.println("Time is  " + elapsedTimeInSecond / 60 + " Minutes");
-        out.println("Throuput is " + (10000 * 215) / elapsedTimeInSecond + " records/second");
-//        HDFSDemo demo = new HDFSDemo();
-//        String path = "/outputs/part-r-00000";
-//        String content = demo.printHDFSFileContents(path);
-//        out.println(parse(content));
-//        return parse(content);
-        return new ArrayList<>();
+        ArrayList<String> answer = new DuckDBManager().queryBatchView(fromDateTime, toDateTime);
+//        String[] args = new String[0];
+//        Path output = new Path("/outputs");
+//        Configuration conf = new Configuration();
+//        FileSystem hdfs = FileSystem.get(URI.create("hdfs://hadoop-master:9000"),conf);
+//
+//        // delete existing directory
+//        if (hdfs.exists(output)) {
+//            hdfs.delete(output, true);
+//        }
+//        output = new Path("/outputs1");
+//        if (hdfs.exists(output)) {
+//            hdfs.delete(output, true);
+//        }
+//        MapReduce.runJob();
+//        ParquetConvert parquetConvert = new ParquetConvert();
+//        parquetConvert.run(args);
+//        output = new Path("/outputs");
+//        if (hdfs.exists(output)) {
+//            hdfs.delete(output, true);
+//        }
+//
+////        runJob();
+//        long finish = System.nanoTime();
+//        long timeElapsed = finish - Totalstart;
+//        double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
+//        out.println("Time is  " + elapsedTimeInSecond + " seconds");
+//        out.println("Time is  " + elapsedTimeInSecond / 60 + " Minutes");
+//        out.println("Throuput is " + (10000 * 215) / elapsedTimeInSecond + " records/second");
+        return answer;
     }
 }
-
-//    public class HDFSDemo {
-//        public static final String HDFS_ROOT_URL = "hdfs://hadoop-master:9000";
-//        private Configuration conf;
-//
-//        public HDFSDemo() {
-//            conf = new Configuration();
-//        }
-//
-//        // Example - Print hdfs file contents to console using Java
-//        public String printHDFSFileContents(String filePath) throws Exception {
-//            FileSystem fs = FileSystem.get(URI.create(HDFS_ROOT_URL),conf);
-//            Path path = new Path(filePath);
-//            FSDataInputStream in = fs.open(path);
-//            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-//            String line = null;
-//            StringBuilder builder = new StringBuilder();
-//            while((line = br.readLine())!= null){
-//                builder.append(line);
-//            }
-//            in.close();
-//            br.close();
-//            fs.close();
-//            return builder.toString();
-//        }
-//    }
-//
-//    public static ArrayList<String> parse(String st){
-//        String s = st.replace("\tArrayWritable ","");
-//        s=s.replace("valueClass=class org.apache.hadoop.io.Text, values=","");
-//        s=s.replace("service-","");
-//        ArrayList<String> list = new ArrayList<>();
-//        StringBuilder builder = new StringBuilder();
-//        for (int i =0; i<s.length();i++){
-//            char c = s.charAt(i);
-//            if(isDigit(c) || c=='.'){
-//                builder.append(c);
-//            }
-//            else {
-//                if (!builder.toString().equals(""))
-//                    list.add(builder.toString());
-//                builder = new StringBuilder();
-//            }
-//        }
-//        return list;
-//    }
-//}

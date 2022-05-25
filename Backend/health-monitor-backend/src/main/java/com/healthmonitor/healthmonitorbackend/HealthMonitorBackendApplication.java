@@ -9,14 +9,6 @@ import java.sql.SQLException;
 public class HealthMonitorBackendApplication {
 
 	public static void main(String[] args) {
-		DuckDBManager duckDBManager = new DuckDBManager();
-		try {
-			duckDBManager.initializeConnection();
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
 		SpringApplication.run(HealthMonitorBackendApplication.class, args);
 	}
 
