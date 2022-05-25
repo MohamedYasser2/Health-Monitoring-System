@@ -42,12 +42,6 @@ public class Main {
             }.getType();
             List<Message> clientMessages = new Gson().fromJson(builder.toString(), listType);
             System.out.println(clientMessages.get(0).toJsonString());
-//            ArrayList<String> messages = messageBatch(socket);
-//            for (int i = 0; i < clientMessages.size(); i++) {
-//                messages.add(clientMessages.get(i).toJsonString());
-//                if(messages.size() == msgNo )
-//                    break;
-//            }
             out.println("Batch arrived.. sending to hadoop");
             Configuration conf = new Configuration();
             conf.set("dfs.replication", "1");
@@ -63,10 +57,6 @@ public class Main {
                     br.write(clientMessages.get(i).getTimeStamp() + "," + clientMessages.get(i).getServiceName() + "," + clientMessages.get(i).getCpu() + "," + clientMessages.get(i).getRam().getTotal() + "," + clientMessages.get(i).getRam().getFree() + "," + clientMessages.get(i).getDisk().getTotal() + "," + clientMessages.get(i).getDisk().getFree());
                 }
                 br.close();
-                long finish = System.nanoTime();
-                long timeElapsed = finish - start;
-                double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
-//                out.println("Time taken to write data to hadoop is " + elapsedTimeInSecond + " seconds");
                 out.println("Appended succesfully");
             } else {
                 long start = System.nanoTime();
@@ -88,11 +78,6 @@ public class Main {
                 out.println("Created succesfully");
             }
             dataCounter++;
-            long finish = System.nanoTime();
-            long timeElapsed = finish - Totalstart;
-            double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
-//            out.println("Total time is " + elapsedTimeInSecond + "seconds / batch");
-//            out.println("Total throughput is " + 1024 / elapsedTimeInSecond + " records/second");
             hdfs.close();
         }
 
@@ -106,16 +91,5 @@ public class Main {
         String s = new String(packet.getData(),0,packet.getLength());
         return s;
     }
-    public static ArrayList<String> messageBatch(DatagramSocket socket) throws IOException {
 
-        ArrayList<String> messages = new ArrayList<>();
-        while(true){
-            String msg = receive_packet(socket);
-            messages.add(msg);
-            out.println(messages.size());
-            if(messages.size() == msgNo )
-                break;
-        }
-        return messages;
-    }
 }
