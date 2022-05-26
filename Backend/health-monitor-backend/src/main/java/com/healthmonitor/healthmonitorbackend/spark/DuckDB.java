@@ -1,3 +1,5 @@
+package com.healthmonitor.healthmonitorbackend.spark;
+
 import java.sql.*;
 
 public class DuckDB {

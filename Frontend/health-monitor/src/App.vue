@@ -10,9 +10,9 @@
           <h2 class="mr-10">To Date</h2>
         </v-row>
         <v-row class="mb-4">
-        <v-date-picker dark class="ml-10"  color ="#1C0A00" v-model="from"></v-date-picker>
-        <v-spacer></v-spacer>
-        <v-date-picker class="mr-10" dark color ="#1C0A00"  v-model="to"></v-date-picker>
+          <v-datetime-picker dark class="ml-10"  color ="#1C0A00" label="Date-Time" v-model="from"> </v-datetime-picker>
+          <v-spacer></v-spacer>
+          <v-datetime-picker dark class="ml-10"  color ="#1C0A00" label="Date-Time" v-model="to"> </v-datetime-picker>
         </v-row>
       </div>
       <div  class="ml-7 my-2" v-if="show">
@@ -29,7 +29,9 @@
 <script>
 import axios from 'axios'
 import Header from './components/Header.vue';
-
+import Vue from 'vue'
+import DatetimePicker from 'vuetify-datetime-picker'
+Vue.use(DatetimePicker)
 export default {
   name: 'App',
 
@@ -50,8 +52,8 @@ export default {
     GetStatistics(){
       axios.get('http://localhost:8080/api/getstatistics',{
         params : {
-          startDate : this.from,
-          endDate : this.to
+          startDate : new Date(this.from),
+          endDate : new Date(this.to)
         }
       })
         .then((response) => {
@@ -59,12 +61,11 @@ export default {
             this.statistics = response.data
             let j=0
             for (let i = 0; i < this.statistics.length; i ++) {
-                this.evaluation[i] ="Service " +  i + ": " + this.statistics[j];
+                this.evaluation[i] = this.statistics[j];
                 j+=1
                 if(j == this.statistics.length)
                     break;
             }
-
             this.show = true
         })
         .catch((error) => {

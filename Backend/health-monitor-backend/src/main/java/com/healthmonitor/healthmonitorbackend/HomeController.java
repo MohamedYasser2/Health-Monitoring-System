@@ -30,49 +30,22 @@ public class HomeController {
         ArrayList<String> test = new ArrayList<>();
         test.add(startDate);
         test.add(endDate);
-        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        out.println(startDate);
+        out.println(endDate);
         long fromDateTime = 0;
         long toDateTime = 0;
         try {
-            Date fromDate = f.parse(startDate);
+            Date fromDate = inputFormat.parse(startDate);
             fromDateTime = fromDate.getTime();
             out.println(fromDateTime);
-            Date toDate = f.parse(endDate);
+            Date toDate = inputFormat.parse(endDate);
             toDateTime = toDate.getTime();
             out.println(toDateTime);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        long Totalstart = System.nanoTime();
-        ArrayList<String> answer = new DuckDBManager().queryBatchView(fromDateTime, toDateTime);
-//        String[] args = new String[0];
-//        Path output = new Path("/outputs");
-//        Configuration conf = new Configuration();
-//        FileSystem hdfs = FileSystem.get(URI.create("hdfs://hadoop-master:9000"),conf);
-//
-//        // delete existing directory
-//        if (hdfs.exists(output)) {
-//            hdfs.delete(output, true);
-//        }
-//        output = new Path("/outputs1");
-//        if (hdfs.exists(output)) {
-//            hdfs.delete(output, true);
-//        }
-//        MapReduce.runJob();
-//        ParquetConvert parquetConvert = new ParquetConvert();
-//        parquetConvert.run(args);
-//        output = new Path("/outputs");
-//        if (hdfs.exists(output)) {
-//            hdfs.delete(output, true);
-//        }
-//
-////        runJob();
-//        long finish = System.nanoTime();
-//        long timeElapsed = finish - Totalstart;
-//        double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
-//        out.println("Time is  " + elapsedTimeInSecond + " seconds");
-//        out.println("Time is  " + elapsedTimeInSecond / 60 + " Minutes");
-//        out.println("Throuput is " + (10000 * 215) / elapsedTimeInSecond + " records/second");
+        ArrayList<String> answer = new DuckDBManager().combineTwoQueries(new DuckDBManager().queryBatchView(fromDateTime, toDateTime), new DuckDBManager().queryRealtimeView(fromDateTime, toDateTime));
         return answer;
     }
 }

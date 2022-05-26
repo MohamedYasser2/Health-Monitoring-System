@@ -23,7 +23,7 @@ public class Main {
         while(true) {
 
             System.out.println("Sending from file number " + counter);
-            String file = "/home/mohamed-yasser/health_data/health_" + counter + ".json";
+            String file = "/media/hadoopuser/College/College Labs/Big Data Systems/health_data/health_" + counter + ".json";
             String json = JsonFileReader.readFileAsString(file);
             String replacedString = json.replaceAll("}\\{", "},{");
 
@@ -38,7 +38,6 @@ public class Main {
             Configuration conf = new Configuration();
             conf.set("dfs.replication", "1");
             FileSystem hdfs = FileSystem.get(new URI("hdfs://hadoop-master:9000"),conf);
-//            LocalDate date = LocalDate.now();
             Path hadoopFile = new Path("hdfs://hadoop-master:9000/inputs/" + "data_" + hadoopCounter + ".csv");
             if ( hdfs.exists( hadoopFile )) {
                 out.println("file is found");
@@ -66,21 +65,10 @@ public class Main {
                 long finish = System.nanoTime();
                 long timeElapsed = finish - start;
                 double elapsedTimeInSecond = (double) timeElapsed / 1_000_000_000;
-//                out.println("Time taken to write data to hadoop is " + elapsedTimeInSecond + " seconds");
                 out.println("Created succesfully");
             }
             hdfs.close();
-            //System.out.println(messages.get(0).toJsonString());
-
-
-//            ArrayList<String> messages=new ArrayList<>();
-//            HealthMessageGenerator generator=new HealthMessageGenerator();
-
-//            int i=100;
-//            while(i>0){
-//                messages.add(generator.generateMessage());
-//                i--;
-//            }
+            System.out.println(messages.get(0).toJsonString());
 
             for (int  i = 0; i < messages.size(); i++) {
 
@@ -91,10 +79,9 @@ public class Main {
 
                 String s=msg.toJsonString().replaceAll("Timestamp","Stamp");
                 send_packet(s);
-                //System.out.println(msg.toJsonString());
 
                 System.out.println("Sending packet " + i);
-                Thread.sleep(3000);
+                Thread.sleep(1000);
             }
         }
     }

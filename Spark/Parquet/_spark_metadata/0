@@ -1,2 +1,2 @@
 v1
-{"path":"file:///home/mohamed-yasser/Projects/Spark/Parquet/part-00000-8cb478cd-1228-4534-b63d-ec7cf15311eb-c000.snappy.parquet","size":1732,"isDir":false,"modificationTime":1653505229889,"blockReplication":1,"blockSize":33554432,"action":"add"}
+{"path":"file:///media/hadoopuser/College/College%20Labs/Big%20Data%20Systems/Health-Monitoring-System/Spark/Parquet/part-00000-509c2af5-8de1-479c-b48b-507df6c8ccc0-c000.snappy.parquet","size":1844,"isDir":false,"modificationTime":1653567814935,"blockReplication":1,"blockSize":33554432,"action":"add"}
